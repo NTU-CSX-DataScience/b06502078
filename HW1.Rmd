@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
   1.農產品批發市場行情站<http://amis.afa.gov.tw/main/Main.aspx>
   
   2.氣象局天氣資料<http://www.cwb.gov.tw/V7/observe/real/NewObs.htm>
+  
+  3.各地區農產品銷售情形
 
 圖表呈現方式
  
@@ -26,16 +28,4 @@ knitr::opts_chunk$set(echo = TRUE)
   氣溫 雨量  北中南分區差異  國民平均所得與農產品銷量關係  
   若是平均所得變高人民蔬菜或是水果購買孰多孰少
 
-```{r cars}
-summary(cars)
-```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
