@@ -1,0 +1,82 @@
+---
+title: "HW3"
+機械一 謝承軒
+B06502078
+---
+分析粉絲團厭世哲學家
+一個有關道家思想的粉絲團
+
+##使用套件
+
+```
+library(Rfacebook)
+library(NLP)
+library(tm)
+library(jiebaRD)
+library(jiebaR)
+library(RColorBrewer)
+library(wordcloud)
+library(wordcloud2)
+```
+##抓取資料
+
+```
+token  = "EAACEdEose0cBAOcbJpcZBUNHEZA4i7r8CslWENDC82gV873aVXRnVQVuvoMyczr6v7xu0dl0gesk2NAfYIFEImz1cduCxoRk08Kjg0bL1DabotDnDFrncAV0IU9zTFj3R1dP0q2udiWohGXsXaGr5dljMRf5f0L4byhryJ6rVrlJZBTAR5uZAGeixJ2YbaiPlBHzEu7fJQZDZD"
+page.id <- "866912333439333" 
+page <- getPage(page.id, token, n = 50)
+
+```
+## 文本清理 並防止莊子老子被清掉
+
+```docs <- Corpus(VectorSource(as.character(page[,3])))
+toSpace <- content_transformer(function(x,pattern){
+  return (gsub(pattern," ",x))
+})
+docs <- tm_map(docs, toSpace, "※")
+docs <- tm_map(docs, toSpace, "◆")
+docs <- tm_map(docs, toSpace, "‧")
+docs <- tm_map(docs, toSpace, "的")
+docs <- tm_map(docs, toSpace, "我")
+docs <- tm_map(docs, toSpace, "也")
+docs <- tm_map(docs, toSpace, "他")
+docs <- tm_map(docs, toSpace, "是")
+docs <- tm_map(docs, toSpace, "就")
+docs <- tm_map(docs, toSpace, "了")
+docs <- tm_map(docs, toSpace, "在")
+docs <- tm_map(docs, toSpace, "但")
+docs <- tm_map(docs, toSpace, "都")
+docs <- tm_map(docs, toSpace, "不")
+docs <- tm_map(docs, toSpace, "與")
+docs <- tm_map(docs, toSpace, "什麼")
+docs <- tm_map(docs, toSpace, "一個")
+docs <- tm_map(docs, toSpace, "們")
+docs <- tm_map(docs, toSpace, "[a-zA-Z]")
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, removeNumbers)
+docs <- tm_map(docs, stripWhitespace)
+mixseg = worker()
+new_user_word(mixseg,'老子','莊子')
+```
+## 製作文字雲 
+
+```jjieba_tokenizer=function(d){
+  unlist(segment(d[[1]],mixseg))
+}
+seg = lapply(docs, jieba_tokenizer)
+freqFrame = as.data.frame(table(unlist(seg)))
+
+wordcloud(freqFrame$Var1,freqFrame$Freq,
+          min.freq=15,scale=c(4,.8),
+          random.order=TRUE,random.color=FALSE, 
+          rot.per=.1, colors=rainbow(length(row.names(freqFrame))),
+          ordered.colors=TRUE,use.r.layout=FALSE,
+          fixed.asp=TRUE)
+```
+
+## 總結來說 這是一個蠻失敗的文字雲
+  能看出的資訊十分有限
+  1.因為道家思想的傳達多是包括自我的探討 
+    所以你和自己這兩個字元出現十分多次
+  2.別人 文言文 快樂 也出現蠻多次
+    是合理的
+  3.可能還要去一些贅字
