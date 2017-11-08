@@ -10,7 +10,7 @@ B06502078
 
 ##使用套件
 
-```
+```{r}
 library(Rfacebook)
 library(NLP)
 library(tm)
@@ -22,15 +22,16 @@ library(wordcloud2)
 ```
 ##抓取資料
 
-```
-token  = "EAACEdEose0cBAOcbJpcZBUNHEZA4i7r8CslWENDC82gV873aVXRnVQVuvoMyczr6v7xu0dl0gesk2NAfYIFEImz1cduCxoRk08Kjg0bL1DabotDnDFrncAV0IU9zTFj3R1dP0q2udiWohGXsXaGr5dljMRf5f0L4byhryJ6rVrlJZBTAR5uZAGeixJ2YbaiPlBHzEu7fJQZDZD"
+```{r}
+token  = "EAACEdEose0cBAD19wJh2AUR2I5oB97JDplFJ6zNCmlaBRToAo70qmQxiTWqJ1tk2NrCHLxO2bsnZBiWFYWMOZAbbGI0S1Gdg2vnDXIwV32KkJ8eIUImHEprkJqpjYAnlPZC9NZCMfjI3vbJpoJc9GYJ34wIli5mdCPB2MKqvLJPZCMMx38F0g9GN9yDzuhn5ZBJQhEcCfbSgZDZD"
 page.id <- "866912333439333" 
 page <- getPage(page.id, token, n = 50)
 
 ```
 ## 文本清理 並防止莊子老子被清掉
 
-```docs <- Corpus(VectorSource(as.character(page[,3])))
+```{r}
+docs <- Corpus(VectorSource(as.character(page[,3])))
 toSpace <- content_transformer(function(x,pattern){
   return (gsub(pattern," ",x))
 })
@@ -61,7 +62,8 @@ new_user_word(mixseg,'老子','莊子')
 ```
 ## 製作文字雲 
 
-```jjieba_tokenizer=function(d){
+```{r}
+jieba_tokenizer=function(d){
   unlist(segment(d[[1]],mixseg))
 }
 seg = lapply(docs, jieba_tokenizer)
@@ -74,9 +76,11 @@ wordcloud(freqFrame$Var1,freqFrame$Freq,
           ordered.colors=TRUE,use.r.layout=FALSE,
           fixed.asp=TRUE)
 ```
+
 ##分析結果
   總結來說 這是一個蠻失敗的文字雲
   能看出的資訊十分有限
   1.因為道家思想的傳達多是包括自我的探討 
     所以你和自己這兩個字元出現十分多次
   2.可能還要去一些贅字
+
