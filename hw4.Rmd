@@ -1,0 +1,181 @@
+---
+title: "hw4"
+output: html_document
+---
+b06502078 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 分析粉絲團 地表最強國文課沒有之一 貼文
+
+資料抓取及清理
+
+```{r}
+library(httr)
+library(rjson)
+library(httpuv)
+library(Rfacebook, warn.conflicts = FALSE)
+library(plyr)
+library(NLP, warn.conflicts = FALSE)
+library(tm)
+library(xml2)
+library(rvest, warn.conflicts = FALSE)
+library(SnowballC)
+library(slam)
+library(Matrix)
+library(jiebaRD)
+library(jiebaR)
+library(RColorBrewer)
+library(wordcloud)
+library(plotly)
+```
+
+
+
+```{r}
+token ="EAACEdEose0cBAKUvjxGJbMmnYIxZAvJmiZBbXlDJqiZC27ttDKUIlZCrNZCSUXmCYAf8UrZCfmZAIvygFUWYOzMZBkuNZCXikKE51XWBpyIWUdPZAO9wpHa7sFOFUzarWdYQgRAfbnlnoEw0ZAErzrGjqCOWQb3JOUrLqJoK5zPxBgtidyyWHrkxKwXPBouSxVResw6bx5g1vBZC4wZDZD"
+page.id = "356452464550780"
+page = getPage(page.id, token, n = 100)
+```
+
+
+```{r}
+docs = Corpus(VectorSource(as.character(page[,3])))
+toSpace = content_transformer(function(x,pattern){
+  return (gsub(pattern," ",x))
+})
+
+docs <- tm_map(docs, toSpace, "※")
+docs <- tm_map(docs, toSpace, "◆")
+docs <- tm_map(docs, toSpace, "‧")
+docs <- tm_map(docs, toSpace, "的")
+docs <- tm_map(docs, toSpace, "我")
+docs <- tm_map(docs, toSpace, "也")
+docs <- tm_map(docs, toSpace, "他")
+docs <- tm_map(docs, toSpace, "是")
+docs <- tm_map(docs, toSpace, "就")
+docs <- tm_map(docs, toSpace, "你")
+docs <- tm_map(docs, toSpace, "啊")
+docs <- tm_map(docs, toSpace, "嗎")
+docs <- tm_map(docs, toSpace, "啦")
+docs <- tm_map(docs, toSpace, "要")
+docs <- tm_map(docs, toSpace, "有")
+docs <- tm_map(docs, toSpace, "及")
+docs <- tm_map(docs, toSpace, "了")
+docs <- tm_map(docs, toSpace, "在")
+docs <- tm_map(docs, toSpace, "但")
+docs <- tm_map(docs, toSpace, "都")
+docs <- tm_map(docs, toSpace, "哈")
+docs <- tm_map(docs, toSpace, "不")
+docs <- tm_map(docs, toSpace, "與")
+docs <- tm_map(docs, toSpace, "什麼")
+docs <- tm_map(docs, toSpace, "一個")
+docs <- tm_map(docs, toSpace, "們")
+docs <- tm_map(docs, toSpace, "這")
+docs <- tm_map(docs, toSpace, "[a-zA-Z]")
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, removeNumbers)
+docs <- tm_map(docs, stripWhitespace)
+mixseg = worker()
+segment = c("中文","語文","國文")
+new_user_word(mixseg,segment)
+```
+## 相關性
+由於貼主是個國文老師
+我們以學生為相關字 差尋相關性超過0.6的字詞
+
+```{r}
+jieba_tokenizer=function(d){
+  unlist(segment(d[[1]],mixseg))
+}
+seg = lapply(docs, jieba_tokenizer)
+freqFrame = as.data.frame(table(unlist(seg)))
+
+d.corpus <- Corpus(VectorSource(seg))
+tdm <- TermDocumentMatrix(d.corpus, 
+                          control = list(wordLengths = c(1, Inf)))
+
+labor = findAssocs(tdm, "學生", 0.6)
+labor
+```
+由結果可以推測他認為學生應具備思考的能力 有學習的典範
+
+```{r}
+N = tdm$ncol
+tf <- apply(tdm, 2, sum)
+idfCal <- function(word_doc)
+{ 
+  log2( N / nnzero(word_doc) ) 
+}
+idf <- apply(tdm, 1, idfCal)
+
+
+doc.tfidf <- as.matrix(tdm)
+for(x in 1:nrow(tdm))
+{
+  for(y in 1:ncol(tdm))
+  {
+    doc.tfidf[x,y] <- (doc.tfidf[x,y] / tf[y]) * idf[x]
+  }
+}
+topID = lapply(rownames(as.data.frame(labor)), function(x) 
+  which(rownames(tdm) == x))
+topID = unlist(topID)
+plot_ly(data = as.data.frame(doc.tfidf),
+        x = as.numeric(colnames(doc.tfidf)),
+        y = doc.tfidf[topID[6],], 
+        name = rownames(doc.tfidf)[topID[6]],
+        type = "scatter", mode= "box") %>%
+  add_trace(y = doc.tfidf[topID[7],],
+            name = rownames(doc.tfidf)[topID[7]])
+```
+
+再以典範與學習做關鍵字 可看出72與29篇同時談到學習與典範
+學習則是單獨出現在7 13篇
+典範在56篇
+
+```{r}
+nonzero = (doc.tfidf != rep(0,11))
+nonzeroid = which(row_sums(nonzero) != 0)
+q <- rownames(doc.tfidf[nonzeroid,])
+all.term <- rownames(doc.tfidf)
+loc <- which(all.term %in% q)
+s.tdm <- doc.tfidf[loc,]
+
+cos.sim <- function(x, y)
+{ 
+  (as.vector(x) %*% as.vector(y)) / (norm(as.matrix(x)) * norm(y)) 
+}
+
+doc.cos <- apply(s.tdm[,1:100], 2, cos.sim,
+                 y=as.matrix(s.tdm[,100]))
+orderDoc <- doc.cos[order(doc.cos, decreasing = TRUE)]
+plot_ly(data = as.data.frame(orderDoc),
+        x = rownames(as.data.frame(orderDoc)),
+        y = orderDoc, 
+        name = rownames(doc.tfidf)[topID[1]],
+        type = "bar", mode= "box")
+```
+
+其實我對於這個分析還有些問題想問
+參考過別的同學的範例之後發現
+好像最後一篇的質方徒都會特別長
+不知道為甚麼
+
+## K-MEANS
+
+```{r}
+set.seed(100)
+kmeansOut <- kmeans(doc.tfidf, 2, nstart = 50)
+plot(doc.tfidf, col =(kmeansOut$cluster +1) , main = "k-means 圖", pch=20, cex=1)
+```
+
+```{r}
+testtfidf = doc.tfidf
+tfidf.pca = prcomp(testtfidf)
+biplot(tfidf.pca,color=c(1,10))
+```
+
+I actually do not know what it means?
