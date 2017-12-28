@@ -1,0 +1,113 @@
+---
+title: "HW5(NEW)"
+output: html_document
+---
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(ggplot2)
+library(magrittr)
+library(e1071)
+library(scales)
+library(reshape2)
+library(stats)
+library(jpeg)
+library(factoextra)
+```
+
+## PART 1 part about PL
+
+```{r}
+pl = read.csv("C:/Users/admin/Desktop/R/pl.csv")
+```
+
+```{r}
+plCor<-cor(pl[,c(1:7)])
+plMelt<-melt(plCor,varnames = c("x","y"),value.name = "Correlation")
+plMelt<-plMelt[order(plMelt$Correlation),]
+ggplot(plMelt,aes(x=x,y=y))+
+  geom_tile(aes(fill=Correlation))+
+  scale_fill_gradient2(low="red",mid="white",high="darkblue",guide=guide_colorbar(ticks=FALSE,barheight=10),limits=c(-1,1))+
+  theme_minimal()+
+  labs(x=NULL,y=NULL)
+```
+
+## PART 2 part about samsung gaming
+```{r}
+SSG = read.csv("C:/Users/admin/Desktop/R/SSG.csv")
+```
+
+
+```{r}
+SSGCor<-cor(SSG[,c(1:4,6:8)])
+SSGMelt<-melt(SSGCor,varnames = c("x","y"),value.name = "Correlation")
+SSGMelt<-SSGMelt[order(SSGMelt$Correlation),]
+ggplot(SSGMelt,aes(x=x,y=y))+
+  geom_tile(aes(fill=Correlation))+
+  scale_fill_gradient2(low="red",mid="white",high="darkblue",guide=guide_colorbar(ticks=FALSE,barheight=10),limits=c(-1,1))+
+  theme_minimal()+
+  labs(x=NULL,y=NULL)
+```
+
+
+```{r}
+
+train_data1 <- SSG[1:22,c(1,2,4)]
+test_data1 <- SSG[23:37, c(2,4)]
+svm_fit1 = svm(as.factor(W.L) ~ ., data = train_data1, 
+             kernel = "polynomial", 
+             cost = 20, scale = FALSE)
+plot(svm_fit1, train_data1)
+
+SSG_predicted1 <- predict(svm_fit1, test_data1)
+
+```
+
+```{r}
+
+result1 = table(SSG_predicted1,SSG[23:37,1])
+print(result1)
+
+```
+
+```{r}
+
+train_data2 <- SSG[1:22,c(1,6,8)]
+test_data2 <- SSG[23:37, c(6,8)]
+svm_fit2 = svm(as.factor(W.L) ~ ., data = train_data2, 
+             kernel = "polynomial", 
+             cost = 20, scale = FALSE)
+plot(svm_fit2, train_data2)
+
+SSG_predicted2 <- predict(svm_fit2, test_data2)
+
+```
+
+```{r}
+
+result2 = table(SSG_predicted2,SSG[23:37,1])
+print(result2)
+
+```
+
+
+```{r}
+
+train_data3 <- SSG[1:27,c(1,6,8)]
+test_data3 <- SSG[28:37, c(6,8)]
+svm_fit3 = svm(as.factor(W.L) ~ ., data = train_data3, 
+             kernel = "polynomial", 
+             cost = 20, scale = FALSE)
+plot(svm_fit3, train_data3)
+
+SSG_predicted3 <- predict(svm_fit3, test_data3)
+
+```
+
+
+```{r}
+
+result3 = table(SSG_predicted3,SSG[28:37,1])
+print(result3)
+
+```
