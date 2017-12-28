@@ -15,7 +15,9 @@ library(jpeg)
 library(factoextra)
 ```
 
-## PART 1 part about PL
+# PART 1 part about PL(英格蘭超級足球聯賽)
+
+分析各種進攻數據與聯賽排名的相關性
 
 ```{r}
 pl = read.csv("C:/Users/admin/Desktop/R/pl.csv")
@@ -32,7 +34,11 @@ ggplot(plMelt,aes(x=x,y=y))+
   labs(x=NULL,y=NULL)
 ```
 
-## PART 2 part about samsung gaming
+###RANK = 聯賽排名 SCORE = 得分 ASIST = 助攻 
+###SHOT = 射門 SHOT ON TARGET = 射正(朝球門射出的球) 
+###SQUARE PASS = 橫傳 CORNER KICK = 角球
+
+# PART 2 part about samsung gaming
 ```{r}
 SSG = read.csv("C:/Users/admin/Desktop/R/SSG.csv")
 ```
