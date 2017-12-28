@@ -1,9 +1,7 @@
 ---
-title: "hw5"
+title: "HW5"
 output: html_document
 ---
-
-
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
@@ -16,7 +14,7 @@ library(jpeg)
 library(factoextra)
 ```
 
-## PART 1 分析英格蘭超級足球聯賽進攻數據 
+## PART 1 part about PL
 
 ```{r}
 pl = read.csv("C:/Users/admin/Desktop/R/pl.csv")
@@ -33,9 +31,7 @@ ggplot(plMelt,aes(x=x,y=y))+
   labs(x=NULL,y=NULL)
 ```
 
-## 分析英雄聯盟職業隊伍samsung gaming之數據
-
-針對 擊殺 死亡 助攻和 每分鐘擊殺死亡助攻 
+## PART 2 part about samsung gaming
 ```{r}
 SSG = read.csv("C:/Users/admin/Desktop/R/SSG.csv")
 ```
