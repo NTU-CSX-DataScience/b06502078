@@ -3,6 +3,8 @@ title: "HW5(NEW)"
 output: html_document
 ---
 
+b06502078 謝承軒
+
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
@@ -38,11 +40,16 @@ ggplot(plMelt,aes(x=x,y=y))+
 ###SHOT = 射門 SHOT ON TARGET = 射正(朝球門射出的球) 
 ###SQUARE PASS = 橫傳 CORNER KICK = 角球
 
+##可看出 傳球多寡對於勝負的結果影響不大 甚至可以說是極低
+
 # PART 2 part about samsung gaming
+
+###分析今年英雄聯盟世界冠軍隊隊伍數據
+###這支隊伍於團隊表現上面是目前五個聯賽裡最優秀的
+
 ```{r}
 SSG = read.csv("C:/Users/admin/Desktop/R/SSG.csv")
 ```
-
 
 ```{r}
 SSGCor<-cor(SSG[,c(1:4,6:8)])
@@ -55,6 +62,16 @@ ggplot(SSGMelt,aes(x=x,y=y))+
   labs(x=NULL,y=NULL)
 ```
 
+###大致上各項數據都符合邏輯
+###可以看出這個遊戲的擊殺助攻與死亡並沒有太大的相關性(畢竟dota遊戲)
+###而這支隊伍由於團隊溝通(隊友配合)較佳 因此擊殺與助攻相關性頗大
+
+
+##由普遍來說最為直觀的數據 擊殺死亡助攻(kda)判斷比賽勝負
+
+##sec 1 
+
+###由擊殺與死亡判斷
 
 ```{r}
 
@@ -69,12 +86,18 @@ SSG_predicted1 <- predict(svm_fit1, test_data1)
 
 ```
 
+
 ```{r}
 
 result1 = table(SSG_predicted1,SSG[23:37,1])
 print(result1)
 
 ```
+#準確率為0.667 偏低
+
+##sec 2 
+
+##加入時間因素 由分鐘擊殺與死亡判斷
 
 ```{r}
 
@@ -95,7 +118,11 @@ result2 = table(SSG_predicted2,SSG[23:37,1])
 print(result2)
 
 ```
+#準確率為 0.933 
 
+##sec 3 
+
+##由分鐘擊殺與死亡判斷 並將training data增加
 
 ```{r}
 
@@ -117,3 +144,9 @@ result3 = table(SSG_predicted3,SSG[28:37,1])
 print(result3)
 
 ```
+#準確率為 1 
+
+###應調高數據數量研究其可用性
+###但因網路上沒有已經統計好的數據
+###因此上述用來測試的數據為我一個一個紀錄的 一時之間沒辦法紀錄太多
+###未來可以以此為基礎 研究一個模組分析比賽勝負
